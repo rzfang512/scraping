@@ -60,5 +60,24 @@ pd.crosstab(shark_df['Sex'], shark_df['Fatal'], normalize='index')
 shark_df['Species'] = shark_df['Species'].astype(str)
 white_shark_prop = shark_df['Species'].str.lower().str.contains('white').mean()
 
+#Q3
+#1 This paper discuss the process of how to clean messy dataset into tidy dataset. It discussed that there was never a mention regarding how to effectively clean a messy dataset, although everyone knows that clean dataset helps alot. 
+#2 Tidy data standard intended to make data analysis tools easier to use and more compatible with each other. It also intended to eliminate the need to constantly transform datasets between tools. 
+#    Tidy data standard helps analysts to focus on solving domain problems instead of spending more time on data formatting. 
+#3 The sentence "Like families, tidy datasets are all alike but every messy dataset is messy in its own way. This quote shows that messy datasets have so many different ways to violate the tidy data standards in its unique way.
+#    The sentence "For a given dataset, it's usually easy to figure out what are observations and what are variables, but it is surprisingly difficult to precisely define variables and observations in general" means that there is no
+# universal rule for each variables and observations. Depending on how data is collected or used, definition is significant but it differs under context. 
+#4 Wickham defines value as collection of dataset, either numbers or strings. Every value belongs to a variable and an observation. A variable contains all values that measure same underlying attributes. An observation contains all values
+measured on the same unit. 
+#5 Tidy data in sections 2.3 is defined with 3 attributes: each variable forms a column, each observation forms a row, and each type of observational unit forms a table. 
+#6 Five most common problems with messy datasets are: column headers are values, not variable names, multiple variables are stored in one column, variables are stored in both rows and columns, multiple types of observational units are stored in
+the same tbale, and a single observational unit is stored in multiple tables. The data in table 4 is messy because its column headers are values, not variable names. Melting is parameterized by a list of columns that are already variables. 
+#7 The reason that table 11 is messy but table 12 is tidy and molten is because table 11 stores variables in both columns and rows, and has columns for each day, and table 12(a) is molten because it puts values into a single column and adds a variable
+indicating the measurement. Table 12(b) is the tidy one. 
+#8 Chicken and egg problem with tidy data is if tidy data is only as useful as the tools that work with it, then tidy tools will be inextricably linked to tidy data. Wickham hoped others will build on the his framework to develop even better data storage
+strategies and better tools. 
+
+
+
 
 
