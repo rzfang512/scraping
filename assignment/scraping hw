@@ -1,0 +1,64 @@
+#Q1
+import pandas as pd
+df = pd.read_csv('./data/airbnb_hw.csv')
+df['price'] = df['price'].str.replace('$','',regex=False).str.replace(',','',regex=False).astype(float)
+df['price'].isna().sum()
+
+police_df = pd.read_csv('./data/mn_police_use_of_force.csv')
+police_df['subject_injury_clean'] = police_df['subject_injury'].map({
+    'Yes': 'Yes', 'No': 'No'
+})
+missing = police_df['subject_injury_clean'].isna().mean()
+crosstab = pd.crosstab(police_df['subject_injury_clean'], police_df['force_type'])
+
+pretrial_df = pd.read_csv('./data/pretrial.csv')
+pretrial_df['ReleasedPretrial'] = pretrial_df['WhetherDefendantWasReleasedPretrial'].map({
+    'Yes': 1, 'No': 0
+})
+pretrial_df['ReleasedPretrial'] = pretrial_df['ReleasedPretrial'].fillna(pd.NA)
+
+mask = pretrial_df['SentenceTypeAllChargesAtConvictionInContactEvent'].isna()
+pretrial_df.loc[mask, 'ImposedSentenceAllChargeInContactEvent'] = pd.NA
+
+#Q2
+shark_df = pd.read_excel('GSAF5.xls')  # Adjust depending on format
+shark_df = shark_df.dropna(axis=1, how='all')  # Drop columns with no data
+shark_df['Year'] = pd.to_numeric(shark_df['Year'], errors='coerce')
+shark_df = shark_df[shark_df['Year'] >= 1940]
+shark_df['Year'].hist()
+shark_df['Age'] = pd.to_numeric(shark_df['Age'], errors='coerce')
+shark_df['Age'].hist()
+
+shark_df['Sex'] = shark_df['Sex'].str.upper()
+prop_male = (shark_df['Sex'] == 'M').mean()
+
+def clean_type(val):
+    if pd.isna(val):
+        return 'Unknown'
+    val = val.lower()
+    if 'provoked' in val:
+        return 'Provoked'
+    elif 'unprovoked' in val:
+        return 'Unprovoked'
+    return 'Unknown'
+
+shark_df['Type'] = shark_df['Type'].apply(clean_type)
+(shark_df['Type'] == 'Unprovoked').mean()
+
+def clean_fatal(val):
+    if pd.isna(val): return 'Unknown'
+    val = str(val).strip().upper()
+    if val == 'Y': return 'Y'
+    if val == 'N': return 'N'
+    return 'Unknown'
+
+shark_df['Fatal'] = shark_df['Fatal (Y/N)'].apply(clean_fatal)
+pd.crosstab(shark_df['Type'], shark_df['Sex'], normalize='index')
+pd.crosstab(shark_df['Type'], shark_df['Fatal'], normalize='index')
+pd.crosstab(shark_df['Sex'], shark_df['Fatal'], normalize='index')
+
+shark_df['Species'] = shark_df['Species'].astype(str)
+white_shark_prop = shark_df['Species'].str.lower().str.contains('white').mean()
+
+
+
