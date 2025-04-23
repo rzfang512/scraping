@@ -1,0 +1,58 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import requests
+import re
+from bs4 import BeautifulSoup as soup
+
+header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+url = 'https://charlottesville.craigslist.org/search/msg'  # Change 'msg' for musical instruments
+
+raw = requests.get(url, headers=header) #Get page
+bsObj = soup(raw.content, 'html.parser')
+listings = bsObj.find_all(class_="cl-static-search-result")
+
+brands = ['yamaha', 'fender', 'gibson', 'roland', 'korg', 'casio', 'martin']
+
+data = []
+for listing in listings:
+    try:
+        title = listing.find('div', class_='title').get_text().lower()
+        price = listing.find('div', class_='price').get_text()
+        link = listing.find(href=True)['href']
+
+        words = title.split()
+        hits = [word for word in words if word in brands]
+        brand = hits[0] if hits else 'missing'
+
+        year_match = re.search(r'20[0-9][0-9]|19[0-9][0-9]', title)
+        year = year_match.group(0) if year_match else np.nan
+
+        data.append({'title': title, 'price': price, 'link': link, 'brand': brand, 'year': year})
+    except Exception as e:
+        print(f"Skipping a listing due to error: {e}")
+
+df = pd.DataFrame(data)
+df['price'] = df['price'].str.replace('$', '').str.replace(',', '')
+df['price'] = pd.to_numeric(df['price'], errors='coerce')
+df['year'] = pd.to_numeric(df['year'], errors='coerce')
+
+print(df.describe())
+
+df['price'].hist(bins=20, edgecolor='black')
+plt.title('Distribution of Prices')
+plt.xlabel('Price')
+plt.ylabel('Count')
+plt.show()
+
+brand_summary = df.groupby('brand')['price'].describe().sort_values(by='mean', ascending=False)
+print(brand_summary)
+
+# Scatterplot of price vs. year (if applicable)
+if df['year'].notna().sum() > 0:
+    sns.scatterplot(data=df, x='year', y='price', hue='brand')
+    plt.title('Price vs. Year by Brand')
+    plt.show()
+
+# There is an outlier in the price of the instrument. There is the most distribution in missing brand music instrument. 
